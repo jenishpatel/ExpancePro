@@ -20,8 +20,8 @@
 
 **ExpensePro** is a powerful, client-side web application designed to give you complete control over your personal finances. Built with modern web technologies, it offers a seamless and intuitive experience for tracking transactions, managing budgets, and gaining deep analytical insights into your spending habits. All your data stays private, stored directly in your browser.
 
-<!-- 🔴 EDIT THIS: Replace with your actual live demo link -->
-### **[➡️ View Live Demo](https://your-live-demo-link.com)**
+
+### **[➡️ View Live Demo](https://expansepro.netlify.app/)**
 
 ---
 
@@ -29,7 +29,6 @@
 
 <table align="center">
   <tr>
-    <!-- 🔴 EDIT THIS: Ensure these image paths are correct -->
     <td align="center" width="50%"><img src="expansepro/assets/dashboard.png" alt="Dashboard View"><br><sub><b>Dynamic Dashboard</b></sub></td>
     <td align="center" width="50%"><img src="expansepro/assets/analytics.png" alt="Analytics View"><br><sub><b>Advanced Analytics</b></sub></td>
   </tr>
@@ -130,12 +129,12 @@ All you need is a modern web browser. For the best experience during development
 
 ## 💡 Using the Demo Data File
 
-This repository includes a `demo_data.csv` file so you can quickly and easily test all of the application's features.
+This repository includes a `expensepro_data.csv` file so you can quickly and easily test all of the application's features.
 
-1.  **Locate the File:** The `demo_data.csv` file is already included in the root of this project.
+1.  **Locate the File:** The `demexpensepro_data.csv` file is already included in the root of this project.
 2.  **Import into ExpensePro:**
     * In the app, navigate to the **Export / Import** panel.
-    * Under "Import Transactions," click "Choose File" and select the `demo_data.csv` file.
+    * Under "Import Transactions," click "Choose File" and select the `expensepro_data.csv` file.
     * Click the "Import from CSV" button. The app will be instantly populated with data for you to explore!
 
 ---
