@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpensePro - Your Financial Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                ExpensePro
+                <button class="hamburger-menu" id="close-sidebar-btn">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-panel="dashboard-panel"><span>🏠</span> <span data-i18n="dashboard">Dashboard</span></a>
+                <a href="#" class="nav-link" data-panel="transactions-panel"><span>📊</span> <span data-i18n="transactions">Transactions</span></a>
+                <a href="#" class="nav-link" id="add-expense-button"><span>➕</span> <span data-i18n="addExpense">Add Expense</span></a>
+                <a href="#" class="nav-link" data-panel="budgets-panel"><span>💰</span> <span data-i18n="budgets">Budgets</span></a>
+                <a href="#" class="nav-link" data-panel="charts-panel"><span>📈</span> <span data-i18n="charts">Charts</span></a>
+                <a href="#" class="nav-link" data-panel="analytics-panel"><span>📊</span> <span data-i18n="analytics">Analytics</span></a>
+                <a href="#" class="nav-link" data-panel="export-import-panel"><span>💾</span> <span data-i18n="exportImport">Export / Import</span></a>
+                <a href="#" class="nav-link" data-panel="settings-panel"><span>⚙️</span> <span data-i18n="settings">Settings</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar (Mobile Hamburger & Desktop Month/Profile) -->
+            <header class="top-navbar">
+                <button class="hamburger-menu" id="open-sidebar-btn">☰</button>
+                <div class="app-name md:hidden">ExpensePro</div>
+              
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+                <button id="lang-toggle" class="lang-toggle" aria-label="Toggle language">🌐 हिन्दी / ગુજરાતી</button>
+            </header>
+
+            <!-- Dashboard Panel -->
+            <section id="dashboard-panel" class="content-panel active">
+                <h3 data-i18n="dashboard">Dashboard Overview</h3>
+                <div class="summary-cards-grid">
+                    <div class="summary-card">
+                        <h4 data-i18n="totalIncome">Total Income</h4>
+                        <p id="total-income-card" class="value income">₹0.00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4 data-i18n="totalExpenses">Total Expenses</h4>
+                        <p id="total-expenses-card" class="value expense">₹0.00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4 data-i18n="netSavings">Net Savings</h4>
+                        <p id="net-savings-card" class="value net-savings">₹0.00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h4 data-i18n="highestSpendingCategory">Highest Spending Category</h4>
+                        <p id="highest-spending-category-card" class="value highest-category">N/A</p>
+                    </div>
+                </div>
+
+                <h3>Key Visualizations</h3>
+                <div class="chart-container">
+                    <h4 data-i18n="categoryDistribution">Category Distribution</h4>
+                    <canvas id="dashboardCategoryPieChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4 data-i18n="monthlyExpenseTrends">Monthly Expense Trends</h4>
+                    <canvas id="dashboardMonthlyLineChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Transactions Panel -->
+            <section id="transactions-panel" class="content-panel">
+                <h3 data-i18n="transactionHistory">Transaction History</h3>
+                <div class="filter-search-group">
+                    <div class="form-control">
+                        <label for="filterPeriod" data-i18n="viewBy">View By</label>
+                        <select id="filterPeriod">
+                            <option value="all" data-i18n="allTransactions">All Transactions</option>
+                            <option value="today" data-i18n="today">Today</option>
+                            <option value="thisMonth" data-i18n="thisMonth">This Month</option>
+                            <option value="thisYear" data-i18n="thisYear">This Year</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label for="search-input" data-i18n="search">Search</label>
+                        <input type="text" id="search-input" placeholder="Description, amount, category..." />
+                    </div>
+                </div>
+                <div class="transaction-list-container">
+                    <ul id="list" class="transaction-list">
+                        <!-- Transactions will be added here dynamically -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Budgets Panel -->
+            <section id="budgets-panel" class="content-panel">
+                <h3>Monthly Budgets</h3>
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
+                    <button id="add-budget-button" class="btn btn-primary"><span>➕</span> Add New Budget</button>
+                    <div class="form-control mb-0 w-full md:w-auto">
+                        <label for="budgetMonthFilter" class="mb-2 block md:hidden">View Budgets By:</label>
+                        <select id="budgetMonthFilter">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div id="budgets-list-container" class="budgets-grid">
+                    <!-- Budget cards will be rendered here -->
+                </div>
+                <p id="no-budgets-message" class="text-color-secondary text-center py-4 hidden">No budgets set for this month.</p>
+            </section>
+
+            <!-- Charts Panel -->
+            <section id="charts-panel" class="content-panel">
+                <h3>Detailed Financial Charts</h3>
+                <div class="filter-section">
+                    <label for="chartFilterPeriod">View Charts By:</label>
+                    <select id="chartFilterPeriod">
+                        <option value="last6months">Last 6 Months</option>
+                        <option value="last12months">Last 12 Months</option>
+                        <option value="alltime">All Time</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <h4>Monthly Expense Trends (Line)</h4>
+                    <canvas id="monthlyExpenseChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Category-wise Expenses (Bar)</h4>
+                    <canvas id="categoryExpenseChart"></canvas>
+                </div>
+            </section>
+
+            <!-- New Analytics Panel -->
+            <section id="analytics-panel" class="content-panel">
+                <h3>Financial Analytics</h3>
+                <div class="analytics-tabs">
+                    <button class="analytics-tab-btn active" data-view="daily-analysis-view">Daily</button>
+                    <button class="analytics-tab-btn" data-view="monthly-analysis-view">Monthly</button>
+                    <button class="analytics-tab-btn" data-view="yearly-analysis-view">Yearly</button>
+                </div>
+
+                <!-- Daily Analysis View -->
+                <div id="daily-analysis-view" class="analytics-view-content active">
+                    <h4>Daily Overview</h4>
+                    <div class="analytics-filter-group">
+                        <div class="form-control">
+                            <label for="dailyAnalysisDate">Select Date</label>
+                            <input type="date" id="dailyAnalysisDate" />
+                        </div>
+                    </div>
+                    <div class="summary-cards-grid">
+                        <div class="summary-card">
+                            <h4>Income</h4>
+                            <p id="daily-income-card" class="value income">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Expenses</h4>
+                            <p id="daily-expenses-card" class="value expense">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Net Balance</h4>
+                            <p id="daily-net-balance-card" class="value net-savings">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Top Category</h4>
+                            <p id="daily-top-category-card" class="value highest-category">N/A</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h4>Daily Income vs. Expense</h4>
+                        <canvas id="dailyIncomeExpenseChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h4>Daily Category Distribution</h4>
+                        <canvas id="dailyCategoryPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly Analysis View -->
+                <div id="monthly-analysis-view" class="analytics-view-content">
+                    <h4>Monthly Overview</h4>
+                    <div class="analytics-filter-group">
+                        <div class="form-control">
+                            <label for="monthlyAnalysisMonth">Select Month</label>
+                            <input type="month" id="monthlyAnalysisMonth" />
+                        </div>
+                    </div>
+                    <div class="summary-cards-grid">
+                        <div class="summary-card">
+                            <h4 data-i18n="totalIncome">Total Income</h4>
+                            <p id="monthly-total-income-card" class="value income">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="totalExpenses">Total Expenses</h4>
+                            <p id="monthly-total-expenses-card" class="value expense">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="netSavings">Net Balance</h4>
+                            <p id="monthly-net-balance-card" class="value net-savings">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="highestSpendingCategory">Top Category</h4>
+                            <p id="monthly-top-category-card" class="value highest-category">N/A</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h4 data-i18n="monthlyExpenseTrends">Daily Trends (Income vs. Expense)</h4>
+                        <canvas id="monthlyDailyTrendsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h4 data-i18n="categoryDistribution">Monthly Category Distribution</h4>
+                        <canvas id="monthlyCategoryPieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Yearly Analysis View -->
+                <div id="yearly-analysis-view" class="analytics-view-content">
+                    <h4>Yearly Overview</h4>
+                    <div class="analytics-filter-group">
+                        <div class="form-control">
+                            <label for="yearlyAnalysisYear">Select Year</label>
+                            <select id="yearlyAnalysisYear"></select>
+                        </div>
+                    </div>
+                    <div class="summary-cards-grid">
+                        <div class="summary-card">
+                            <h4 data-i18n="totalIncome">Total Income</h4>
+                            <p id="yearly-total-income-card" class="value income">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="totalExpenses">Total Expenses</h4>
+                            <p id="yearly-total-expenses-card" class="value expense">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="netSavings">Net Balance</h4>
+                            <p id="yearly-net-balance-card" class="value net-savings">₹0.00</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4 data-i18n="highestSpendingCategory">Top Category</h4>
+                            <p id="yearly-top-category-card" class="value highest-category">N/A</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h4 data-i18n="monthlyExpenseTrends">Monthly Performance (Income vs. Expense)</h4>
+                        <canvas id="yearlyMonthlyTrendsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h4 data-i18n="categoryDistribution">Yearly Category Distribution</h4>
+                        <canvas id="yearlyCategoryPieChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Export / Import Panel -->
+            <section id="export-import-panel" class="content-panel">
+                <h3 data-i18n="exportImport">Data Management</h3>
+                <div class="settings-group">
+                    <h4 data-i18n="exportImport">Export Transactions</h4>
+                    <p class="info-text">Export your complete transaction history to a CSV file. This includes all regular and generated recurring transactions.</p>
+                    <div class="action-buttons">
+                        <button id="export-csv-btn" class="btn btn-primary"><span>⬇️</span> Export to CSV</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h4 data-i18n="exportImport">Import Transactions</h4>
+                    <p class="info-text">Import transactions from a CSV file. Ensure your CSV is formatted correctly (Date,Description,Amount,Category).</p>
+                    <div class="action-buttons">
+                        <input type="file" id="import-csv-file-input" accept=".csv" class="mb-2" />
+                        <button id="import-csv-btn" class="btn btn-primary"><span>⬆️</span> Import from CSV</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Panel -->
+            <section id="settings-panel" class="content-panel">
+                <h3 data-i18n="settings">Application Settings</h3>
+             
+
+                <div class="settings-group">
+                    <h4 data-i18n="categories">Manage Categories</h4>
+                    <p class="info-info">Add or remove custom transaction categories.</p>
+                    <div class="category-input-group">
+                        <input type="text" id="newCategoryInput" placeholder="New category name..." />
+                        <button type="button" id="addCategoryBtn" class="btn-primary" data-i18n="add">Add</button>
+                    </div>
+                    <div id="category-list-container">
+                        <ul>
+                            <!-- Categories will be listed here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h4 data-i18n="recurring">Manage Recurring Transactions</h4>
+                    <p class="info-text">Review and manage your recurring transaction templates.</p>
+                    <ul id="recurring-transactions-list" class="transaction-list">
+                        <!-- Recurring templates will be listed here -->
+                    </ul>
+                </div>
+
+                <div class="settings-group">
+                    <h4 data-i18n="dangerZone">Danger Zone</h4>
+                    <p class="info-text">Reset all data and start fresh. This will delete all transactions, budgets, categories (except defaults), and recurring transactions. <strong>This action cannot be undone!</strong></p>
+                    <button id="reset-all-data-btn" class="btn btn-expense"><span>🗑️</span> <span data-i18n="reset">Reset All Data</span></button>
+                </div>
+
+                  <!-- Theme Dropdown -->
+                <div class="settings-group">
+                    <label for="theme-select" class="sr-only">Themes</label>
+                    <select id="theme-select" class="theme-select">
+                        <option value="slate">Slate</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="blue">Blue</option>
+                        <option value="purple">Purple</option>
+                        <option value="red">Red</option>
+                        <option value="classicBlue">Classic Blue</option>
+                        <option value="performanceGreen">Performance Green</option>
+                        <option value="trackerBlues">Tracker Blues</option>
+                        <option value="financeGreens">Finance Greens</option>
+                        <option value="accentRed">Accent Red</option>
+                        <option value="royalblue">Royal Blue</option>
+                    </select>
+                    <span class="theme-dropdown-label">Themes</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Expense Modal -->
+    <div id="addEditExpenseModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeAddEditModal">✕</button>
+            <h3 id="modal-title">Add New Transaction</h3>
+            <div id="modal-error-message" class="error-message"></div>
+            <form id="modal-form">
+                <div class="form-control">
+                    <label for="modalText">Description</label>
+                    <input type="text" id="modalText" placeholder="Enter description..." />
+                </div>
+                <div class="form-control">
+                    <label for="modalAmount">Amount</label>
+                    <input type="number" id="modalAmount" placeholder="Enter amount..." />
+                </div>
+                <div class="form-control">
+                    <label for="modalDate">Date</label>
+                    <input type="date" id="modalDate" />
+                </div>
+                <div class="form-control">
+                    <label for="modalCategory">Category</label>
+                    <select id="modalCategory">
+                        <!-- Categories loaded dynamically by JS -->
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="modalRecurrence">Recurrence</label>
+                    <select id="modalRecurrence">
+                        <option value="none">None</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-control" id="modal-recurrence-end-date-container" style="display: none;">
+                    <label for="modalRecurrenceEndDate">Repeat Until</label>
+                    <input type="date" id="modalRecurrenceEndDate" />
+                </div>
+                <div class="btn-modal-group">
+                    <button type="submit" id="modalAddIncomeBtn" class="btn btn-income" data-type="income">Add Income</button>
+                    <button type="submit" id="modalAddExpenseBtn" class="btn btn-expense" data-type="expense">Add Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Budget Modal -->
+    <div id="addEditBudgetModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeAddEditBudgetModal">✕</button>
+            <h3 id="budget-modal-title">Add New Budget</h3>
+            <div id="budget-modal-error-message" class="error-message"></div>
+            <form id="budget-modal-form">
+                <input type="hidden" id="budgetEditId"> <!-- Hidden field for editing existing budget -->
+                <div class="form-control">
+                    <label for="budgetModalCategory">Category</label>
+                    <select id="budgetModalCategory">
+                        <!-- Categories loaded dynamically by JS -->
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label for="budgetModalLimit">Monthly Limit (₹)</label>
+                    <input type="number" id="budgetModalLimit" placeholder="e.g., 5000" min="1" step="0.01" />
+                </div>
+                <div class="form-control">
+                    <label for="budgetModalMonth">Month</label>
+                    <input type="month" id="budgetModalMonth" />
+                </div>
+                <div class="btn-modal-group">
+                    <button type="submit" id="addBudgetSubmitBtn" class="btn btn-primary">Add Budget</button>
+                    <button type="button" id="updateBudgetSubmitBtn" class="btn btn-primary hidden">Update Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal (Custom replacement for confirm()) -->
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="confirmation-modal-title">Confirm Action</h3>
+            <p id="confirmation-modal-message" class="text-color-secondary mb-6"></p>
+            <div class="btn-modal-group"></div>
+                <button id="confirm-yes-btn" class="btn btn-primary">Yes</button>
+                <button id="confirm-no-btn" class="btn delete-btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast-message"></div>
+
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
